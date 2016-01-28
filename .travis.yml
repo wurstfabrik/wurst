@@ -3,6 +3,8 @@ language: python
 cache:
   directories:
     - "$HOME/.cache/pip"
+env:
+- DEBUG=1
 python:
   - "2.7"
   - "3.4"
