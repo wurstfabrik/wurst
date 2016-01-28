@@ -1,5 +1,7 @@
 import os
+
 from environ import Env
+
 env = Env()
 HOME_DIR = env.str(
     "HOME_DIR",
