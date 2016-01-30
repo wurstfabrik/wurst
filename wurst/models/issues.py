@@ -10,6 +10,10 @@ from wurst.consts import StatusCategory
 
 @python_2_unicode_compatible
 class IssueType(models.Model):
+    """
+    An issue type, e.g. "Task", "Bug", "Story", ...
+    """
+
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from='name', unique=True)
     nouns = models.TextField(blank=True)
@@ -21,6 +25,10 @@ class IssueType(models.Model):
 
 @python_2_unicode_compatible
 class Status(models.Model):
+    """
+    A status associated with a given issue, e.g. "to do", "in progress", "rejected", "done"
+    """
+
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from='name', unique=True)
     category = EnumIntegerField(StatusCategory, db_index=True, default=StatusCategory.OPEN)
@@ -35,6 +43,10 @@ class Status(models.Model):
 
 @python_2_unicode_compatible
 class Priority(models.Model):
+    """
+    A priority for an issue, e.g. "high", "low", "critical", "whenever"
+    """
+
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from='name', unique=True)
     nouns = models.TextField(blank=True)
@@ -46,6 +58,10 @@ class Priority(models.Model):
 
 @python_2_unicode_compatible
 class Issue(models.Model):
+    """
+    The main issue model.
+    """
+
     project = models.ForeignKey("wurst.Project", related_name="issues")
     type = models.ForeignKey("wurst.IssueType", related_name="issues")
     status = models.ForeignKey("wurst.Status", related_name="issues")
@@ -70,13 +86,23 @@ class Issue(models.Model):
     # TODO: issue linking
 
     def save(self, *args, **kwargs):
+        self._fill_fields()
+        super(Issue, self).save(*args, **kwargs)
+
+    def clean(self):
+        self._fill_fields()
+        super(Issue, self).clean()
+
+    def _fill_fields(self):
+        """
+        Fill in any empty fields. Called upon save and clean.
+        """
         if not self.key:
             self.key = self.project.generate_key()
         if not self.priority_id:
             self.priority = Priority.objects.filter(value=0).first()
         if not self.status_id:
             self.status = Status.objects.filter(value=StatusCategory.OPEN.value).order_by("value").first()
-        super(Issue, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.key
