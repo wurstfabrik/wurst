@@ -16,4 +16,5 @@ script:
   - flake8 wurst
   - isort -c -rc wurst
   - py.test -ra -vvv --doctest-modules --cov
-#after_success: coveralls
+after_script:
+  - pydocstyle wurst
