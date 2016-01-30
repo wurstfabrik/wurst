@@ -1,0 +1,28 @@
+[[type]]
+name = "Task"
+
+[[status]]
+name = "To Do"
+
+[[status]]
+name = "In Progress"
+
+[[status]]
+name = "Done"
+category = 2
+
+[[priority]]
+name = "Low"
+value = -10
+
+[[priority]]
+name = "Normal"
+value = 0
+
+[[priority]]
+name = "High"
+value = 50
+
+[[priority]]
+name = "Critical"
+value = 100
