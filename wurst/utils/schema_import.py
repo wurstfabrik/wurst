@@ -1,10 +1,19 @@
 import sys
 from collections import defaultdict
 
+import toml
+
 from wurst.models import IssueType, Priority, Status
 
 
 class SchemaImporter:
+    """
+    An utility to import an issue type/priority/status/... schema.
+
+    After the import is finished, the ``objects`` field will be populated
+    with the imported objects.
+    """
+
     stderr = sys.stderr
     type_to_class = {
         "type": IssueType,
@@ -15,7 +24,25 @@ class SchemaImporter:
     def __init__(self):
         self.objects = defaultdict(dict)
 
+    def import_from_toml(self, fp):
+        """
+        Import from a file-like object where TOML markup can be read from.
+
+        :param fp: A filelike object.
+        :return: Naught.
+        """
+        data = toml.load(fp)
+        self.import_from_data(data)
+
     def import_from_data(self, data):
+        """
+        Import objects into the database from the given data dictionary.
+
+        :param data: Data dictionary
+        :type data: dict[str,list[dict]]
+        :return: Does not return a value, but the instance's
+                 `.objects` dict will have been modified
+        """
         for type, items in data.items():
             if not isinstance(items, list):
                 continue
@@ -29,6 +56,22 @@ class SchemaImporter:
                 importer(type, val)
 
     def generic_importer(self, type, datum):
+        """
+        Import an object using the `type_to_class` mapping.
+
+        As an added bonus, will not try reimporting objects if a slug
+        is specified.
+
+        :param type: Object type string, e.g. "priority"
+        :param datum: An object datum
+        :type datum: dict[str,object]
+        :return: The created object.
+        """
         model_class = self.type_to_class[type]
-        obj = model_class.objects.create(**datum)
-        self.objects[type][obj.slug] = obj
+        obj = None
+        if "slug" in datum:  # See if we already got one...
+            obj = model_class.objects.filter(slug=datum["slug"]).first()
+        if obj is None:  # Not found? Create it.
+            obj = model_class.objects.create(**datum)
+        self.objects[type][getattr(obj, "slug", obj.pk)] = obj
+        return obj

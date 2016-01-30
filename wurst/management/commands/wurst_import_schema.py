@@ -1,4 +1,3 @@
-import toml
 from django.core.management.base import BaseCommand
 from django.db.transaction import atomic
 
@@ -11,9 +10,8 @@ class Command(BaseCommand):
 
     @atomic
     def handle(self, file, **options):
-        with open(file, "r") as infp:
-            data = toml.load(infp)
-
         schitter = SchemaImporter()
         schitter.stderr = self.stderr
-        schitter.import_from_data(data)
+
+        with open(file, "r") as infp:
+            schitter.import_from_toml(infp)

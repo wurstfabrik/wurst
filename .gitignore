@@ -41,3 +41,4 @@ sdist/
 target/
 var/
 *.sqlite*
+/venv*
