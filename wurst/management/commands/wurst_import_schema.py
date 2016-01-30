@@ -17,4 +17,3 @@ class Command(BaseCommand):
         schitter = SchemaImporter()
         schitter.stderr = self.stderr
         schitter.import_from_data(data)
-

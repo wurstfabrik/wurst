@@ -1,9 +1,7 @@
-import os
-
 import pytest
 
 from wurst.consts import StatusCategory
-from wurst.models import Project, IssueType, Priority, Status
+from wurst.models import IssueType, Priority, Project, Status
 from wurst.utils.schema_import import SchemaImporter
 
 BASIC_SCHEMA_DATA = {

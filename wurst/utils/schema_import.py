@@ -1,7 +1,7 @@
 import sys
 from collections import defaultdict
 
-from wurst.models import IssueType, Status, Priority
+from wurst.models import IssueType, Priority, Status
 
 
 class SchemaImporter:

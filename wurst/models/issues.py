@@ -39,9 +39,9 @@ class Issue(models.Model):
     start_date = models.DateField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     created = models.DateTimeField(default=now, editable=False, db_index=True)
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
-        null=True, blank=True, related_name="issues_created",
-        editable=False
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True, related_name="issues_created", editable=False
     )
     assignee = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -51,7 +51,6 @@ class Issue(models.Model):
     # TODO: parent FK?
     # TODO: tags
     # TODO: issue linking
-
 
     def save(self, *args, **kwargs):
         if not self.key:

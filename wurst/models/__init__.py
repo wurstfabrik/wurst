@@ -1,2 +1,2 @@
-from .issues import Issue, IssueType, Priority, Status
-from .projects import Project
+from .issues import Issue, IssueType, Priority, Status  # noqa
+from .projects import Project  # noqa
