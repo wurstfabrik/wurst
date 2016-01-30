@@ -13,7 +13,7 @@ DEBUG = env.bool("DEBUG", False)
 SECRET_KEY = env.bool("SECRET_KEY", "Sehr lecker Wurst" if DEBUG else Env.NOTSET)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 DATABASES = {
-    "default": env.db_url(default="sqlite://%s" % os.path.join(HOME_DIR, "wurst.sqlite3"))
+    "default": env.db_url(default="sqlite:///%s" % os.path.join(HOME_DIR, "wurst.sqlite3"))
 }
 STATIC_ROOT = env.str("STATIC_ROOT", default=os.path.join(HOME_DIR, "static"))
 MEDIA_ROOT = env.str("MEDIA_ROOT", default=os.path.join(HOME_DIR, "media"))
