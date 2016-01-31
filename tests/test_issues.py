@@ -10,3 +10,5 @@ def test_issue_creation(basic_schema, project):
         type=basic_schema["type"]["task"]
     )
     assert i.key.startswith(project.prefix)
+
+

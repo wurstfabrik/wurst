@@ -55,6 +55,9 @@ class Priority(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'priorities'
+
 
 @python_2_unicode_compatible
 class Issue(models.Model):

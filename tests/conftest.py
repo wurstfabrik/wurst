@@ -1,4 +1,5 @@
 import pytest
+from rest_framework.test import APIClient
 
 from wurst.consts import StatusCategory
 from wurst.models import IssueType, Priority, Project, Status
@@ -56,3 +57,11 @@ def done_status():
 @pytest.fixture
 def closed_status():
     return Status.objects.get_or_create(name="Closed", slug="closed", category=StatusCategory.CLOSED)[0]
+
+
+@pytest.fixture()
+def admin_api_client(admin_user):
+    api_client = APIClient()
+    api_client.login(username=admin_user.username, password="password")
+    api_client.user = admin_user
+    return api_client

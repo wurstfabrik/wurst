@@ -15,6 +15,8 @@ class SchemaImporter:
     """
 
     stderr = sys.stderr
+    stdout = sys.stdout
+
     type_to_class = {
         "type": IssueType,
         "status": Status,
@@ -73,5 +75,7 @@ class SchemaImporter:
             obj = model_class.objects.filter(slug=datum["slug"]).first()
         if obj is None:  # Not found? Create it.
             obj = model_class.objects.create(**datum)
-        self.objects[type][getattr(obj, "slug", obj.pk)] = obj
+        idfr = getattr(obj, "slug", obj.pk)
+        self.objects[type][idfr] = obj
+        self.stdout.write("%s processed: %s" % (type.title(), idfr))
         return obj

@@ -5,6 +5,6 @@ from wurst.api.router import get_router
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include(get_router().urls)),
+    url(r'^api/v1/', include(get_router().urls, namespace='v1')),
 
 ]

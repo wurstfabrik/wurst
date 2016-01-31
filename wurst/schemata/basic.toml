@@ -1,28 +1,36 @@
 [[type]]
 name = "Task"
+slug = "task"
 
 [[status]]
 name = "To Do"
+slug = "todo"
 
 [[status]]
 name = "In Progress"
+slug = "progress"
 
 [[status]]
 name = "Done"
+slug = "done"
 category = 2
 
 [[priority]]
 name = "Low"
+slug = "low"
 value = -10
 
 [[priority]]
 name = "Normal"
+slug = "normal"
 value = 0
 
 [[priority]]
 name = "High"
+slug = "high"
 value = 50
 
 [[priority]]
 name = "Critical"
+slug = "critical"
 value = 100

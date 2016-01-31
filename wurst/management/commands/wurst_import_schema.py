@@ -11,6 +11,7 @@ class Command(BaseCommand):
     @atomic
     def handle(self, file, **options):
         schitter = SchemaImporter()
+        schitter.stdout = self.stdout
         schitter.stderr = self.stderr
 
         with open(file, "r") as infp:
