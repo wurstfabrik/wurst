@@ -80,5 +80,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',  # TODO: This shouldn't be necessary, but some tests fail w/ multipart!
 }
