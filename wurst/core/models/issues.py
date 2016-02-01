@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from enumfields import EnumIntegerField
+from reversion import revisions as reversion
 
 from wurst.core.consts import StatusCategory
 
@@ -59,6 +60,7 @@ class Priority(models.Model):
         verbose_name_plural = 'priorities'
 
 
+@reversion.register
 @python_2_unicode_compatible
 class Issue(models.Model):
     """
