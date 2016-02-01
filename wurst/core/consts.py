@@ -1,4 +1,8 @@
+import re
+
 from enumfields import Enum
+
+ISSUE_KEY_RE = re.compile(r"^\w+-\d+$", re.I)
 
 
 class StatusCategory(Enum):

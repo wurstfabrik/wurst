@@ -7,14 +7,7 @@ from enumfields import EnumIntegerField
 from reversion import revisions as reversion
 
 from wurst.core.consts import StatusCategory
-
-
-class NounsMixin(object):
-    def get_nouns(self):
-        nouns = set(self.nouns.split())
-        nouns.add(self.slug)
-        nouns.add(self.name)
-        return nouns
+from wurst.core.mixins.nouns import NounsMixin
 
 
 @python_2_unicode_compatible

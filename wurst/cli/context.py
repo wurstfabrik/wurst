@@ -3,20 +3,22 @@
 from __future__ import unicode_literals
 
 import sys
+from inspect import isclass
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import cached_property
 
-from wurst.core.models.issues import IssueType, Priority, Status
+from wurst.core.consts import ISSUE_KEY_RE
+from wurst.core.models import Issue, IssueType, Priority, Project, Status
 
-from .commands import COMMANDS
+from .commands import Command, COMMANDS
 
 if sys.version_info[0] < 3:
     import ushlex as shlex
 else:
     import shlex
 
-
-NOUN_CLASSES = [IssueType, Status, Priority]
+NOUN_CLASSES = [IssueType, Status, Priority, Project]
 
 
 class Context(object):
@@ -48,12 +50,48 @@ class Context(object):
 
         return the_terms
 
+    def enrich_part(self, part):
+        """
+        Enriches a single part (which, well, might contain more than one actual word).
+
+        :param part: A part(-of-speech) to enrich.
+        :return: The part itself, or a model.
+        """
+
+        if part in self.terms:  # Try the "static" part dictionary...
+            return self.terms[part]
+
+        if ISSUE_KEY_RE.match(part):  # See if the part smells like an issue key...
+            try:
+                return Issue.objects.get(key=part)
+            except ObjectDoesNotExist:
+                pass
+
+        # See if it's an unique prefix (if it's long enough anyway)
+        if len(part) > 2:
+            prefix_matches = [obj for (term, obj) in self.terms.items() if term.startswith(part)]
+            if len(prefix_matches) == 1:
+                return prefix_matches[0]
+
+        return part
+
     def enrich_command(self, command):
         """
         Enriches the command by replacing recognized words with their model instance counterparts.
 
+        If multiple terms referring to Commands are found, only one is enriched; the rest are not
+        enriched but returned as-is.
+
         :param command: A string understood by shlex
         :returns: The command split into words and model instances
-        :rtype: list[str|django.db.models.Model|Command]
+        :rtype: Iterable[str|django.db.models.Model|Command]
         """
-        return [self.terms.get(part, part) for part in shlex.split(command)]
+        found_cmd = False
+        for part in shlex.split(command):
+            e_part = self.enrich_part(part)
+            if isclass(e_part) and issubclass(e_part, Command):
+                if not found_cmd:
+                    found_cmd = True
+                else:
+                    e_part = part  # Revert back to yielding the string
+            yield e_part

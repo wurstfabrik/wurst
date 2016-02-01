@@ -2,9 +2,11 @@ from autoslug.fields import AutoSlugField
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+from wurst.core.mixins.nouns import NounsMixin
+
 
 @python_2_unicode_compatible
-class Project(models.Model):
+class Project(NounsMixin, models.Model):
     """
     A Project; the top-level model that holds issues.
     """
@@ -29,3 +31,6 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_nouns(self):
+        return super(Project, self).get_nouns() | {self.prefix.strip("-")}
