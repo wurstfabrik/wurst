@@ -1,5 +1,5 @@
 # -- encoding: UTF-8 --
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, ImproperlyConfigured
 from django.utils.encoding import force_text
 from rest_framework.fields import Field
 from rest_framework.relations import RelatedField
@@ -21,13 +21,15 @@ class ScalarUnserializerMixin:
                 queryset = self.get_queryset()
             elif hasattr(self, "Meta"):  # used on Serializers?
                 queryset = self.Meta.model.objects.all()
+            else:
+                raise ImproperlyConfigured("ScalarUnserializerMixin used on %r, unsupported" % self)
             return unserialize_by_scalar(queryset, data)
         return super(ScalarUnserializerMixin, self).to_internal_value(self, data)
 
 
 class SlugOrPKRelatedField(ScalarUnserializerMixin, RelatedField):
     def __init__(self, slug_field="slug", **kwargs):
-        self.slug_field = "slug"
+        self.slug_field = slug_field
         RelatedField.__init__(self, **kwargs)
 
     def to_internal_value(self, data):
