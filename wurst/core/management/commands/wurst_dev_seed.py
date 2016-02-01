@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.core.management.commands.migrate import Command as MigCommand
 from django.db.utils import DEFAULT_DB_ALIAS
 
-from wurst.models import Project
+from wurst.core.models import Project
 
 from .wurst_import_schema import Command as WISCommand
 

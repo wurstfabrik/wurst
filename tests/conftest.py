@@ -1,9 +1,9 @@
 import pytest
 from rest_framework.test import APIClient
 
-from wurst.consts import StatusCategory
-from wurst.models import IssueType, Priority, Project, Status
-from wurst.utils.schema_import import SchemaImporter
+from wurst.core.consts import StatusCategory
+from wurst.core.models import IssueType, Priority, Project, Status
+from wurst.core.utils.schema_import import SchemaImporter
 
 BASIC_SCHEMA_DATA = {
     'status': [{'name': 'To Do'}, {'name': 'In Progress'}, {'name': 'Done', 'category': 1}],

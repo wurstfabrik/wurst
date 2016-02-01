@@ -1,7 +1,7 @@
 from rest_framework import permissions, viewsets
 
 from wurst.api.serializers import IssueSerializer, ProjectSerializer
-from wurst.models import Issue, Project
+from wurst.core.models import Issue, Project
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

@@ -5,7 +5,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from enumfields import EnumIntegerField
 
-from wurst.consts import StatusCategory
+from wurst.core.consts import StatusCategory
 
 
 @python_2_unicode_compatible

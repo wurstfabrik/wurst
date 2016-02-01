@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import toml
 
-from wurst.models import IssueType, Priority, Status
+from wurst.core.models import IssueType, Priority, Status
 
 
 class SchemaImporter:

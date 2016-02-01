@@ -4,7 +4,7 @@ import json
 import pytest
 from rest_framework.serializers import ModelSerializer
 from wurst.api.serializers import StatusSerializer, ProjectSerializer
-from wurst.models import Status, Issue
+from wurst.core.models import Status, Issue
 
 
 def test_status_serialization():

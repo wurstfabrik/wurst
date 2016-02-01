@@ -1,6 +1,6 @@
 import pytest
 
-from wurst.models import Issue
+from wurst.core.models import Issue
 
 
 @pytest.mark.django_db
