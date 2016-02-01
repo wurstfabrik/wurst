@@ -8,7 +8,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import enumfields.fields
-import wurst.consts
+import wurst.core.consts
 
 
 class Migration(migrations.Migration):
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
                 ('slug', autoslug.fields.AutoSlugField(editable=False, populate_from='name', unique=True)),
-                ('category', enumfields.fields.EnumIntegerField(db_index=True, default=0, enum=wurst.consts.StatusCategory)),
+                ('category', enumfields.fields.EnumIntegerField(db_index=True, default=0, enum=wurst.core.consts.StatusCategory)),
                 ('value', models.IntegerField(db_index=True, default=0)),
             ],
         ),

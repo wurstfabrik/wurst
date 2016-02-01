@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'wurst'
+    'wurst.core',
+    'wurst.api'
 ]
 
 MIDDLEWARE_CLASSES = [

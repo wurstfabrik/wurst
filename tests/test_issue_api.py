@@ -3,7 +3,7 @@ import pytest
 from django.core.urlresolvers import reverse
 from django.utils.crypto import get_random_string
 from tests.utils import get_response_data
-from wurst.models import Issue
+from wurst.core.models import Issue
 
 
 @pytest.mark.django_db

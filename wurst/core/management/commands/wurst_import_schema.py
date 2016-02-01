@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db.transaction import atomic
 
-from wurst.utils.schema_import import SchemaImporter
+from wurst.core.utils.schema_import import SchemaImporter
 
 
 class Command(BaseCommand):

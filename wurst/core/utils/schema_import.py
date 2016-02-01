@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import toml
 
-from wurst.models import IssueType, Priority, Status
+from wurst.core.models import IssueType, Priority, Status
 
 
 class SchemaImporter:
@@ -45,37 +45,37 @@ class SchemaImporter:
         :return: Does not return a value, but the instance's
                  `.objects` dict will have been modified
         """
-        for type, items in data.items():
+        for obj_type, items in data.items():
             if not isinstance(items, list):
                 continue
-            importer = getattr(self, "import_%s" % type, None)
+            importer = getattr(self, "import_%s" % obj_type, None)
             if not importer:
-                if type in self.type_to_class:
+                if obj_type in self.type_to_class:
                     importer = self.generic_importer
             if not importer:
-                self.stderr.write("No importer for %r" % type)
+                self.stderr.write("No importer for %r" % obj_type)
             for val in items:
-                importer(type, val)
+                importer(obj_type, val)
 
-    def generic_importer(self, type, datum):
+    def generic_importer(self, obj_type, datum):
         """
         Import an object using the `type_to_class` mapping.
 
         As an added bonus, will not try reimporting objects if a slug
         is specified.
 
-        :param type: Object type string, e.g. "priority"
+        :param obj_type: Object type string, e.g. "priority"
         :param datum: An object datum
         :type datum: dict[str,object]
         :return: The created object.
         """
-        model_class = self.type_to_class[type]
+        model_class = self.type_to_class[obj_type]
         obj = None
         if "slug" in datum:  # See if we already got one...
             obj = model_class.objects.filter(slug=datum["slug"]).first()
         if obj is None:  # Not found? Create it.
             obj = model_class.objects.create(**datum)
         idfr = getattr(obj, "slug", obj.pk)
-        self.objects[type][idfr] = obj
-        self.stdout.write("%s processed: %s" % (type.title(), idfr))
+        self.objects[obj_type][idfr] = obj
+        self.stdout.write("%s processed: %s" % (obj_type.title(), idfr))
         return obj

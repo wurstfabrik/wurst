@@ -10,11 +10,12 @@ python:
   - "3.4"
 install:
   - pip install -U pip
-#  - pip install coveralls
-  - pip install -r requirements.txt -r requirements-dev.txt
+  - pip install coveralls -r requirements.txt -r requirements-dev.txt
 script:
   - flake8 wurst
   - isort -c -rc wurst
   - py.test -ra -vvv --doctest-modules --cov
+after_success:
+  - coveralls
 after_script:
   - pydocstyle wurst
