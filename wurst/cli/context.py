@@ -6,7 +6,7 @@ import sys
 
 from django.utils.functional import cached_property
 
-from wurst.core.models.issues import IssueType, Priority, Status
+from wurst.core.models import Issue, IssueType, Priority, Project, Status
 
 from .commands import COMMANDS
 
@@ -15,8 +15,7 @@ if sys.version_info[0] < 3:
 else:
     import shlex
 
-
-NOUN_CLASSES = [IssueType, Status, Priority]
+NOUN_CLASSES = [IssueType, Status, Priority, Project]
 
 
 class Context(object):
