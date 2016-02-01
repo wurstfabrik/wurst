@@ -3,11 +3,12 @@
 from __future__ import unicode_literals
 
 import sys
-from collections import namedtuple
 
 from django.utils.functional import cached_property
 
 from wurst.core.models.issues import IssueType, Priority, Status
+
+from .commands import COMMANDS
 
 if sys.version_info[0] < 3:
     import ushlex as shlex
@@ -16,14 +17,6 @@ else:
 
 
 NOUN_CLASSES = [IssueType, Status, Priority]
-
-# Stub, replace with a real Command class
-Command = namedtuple("Command", "slug verbs")
-
-wurst = Command(slug="wurst", verbs=["wurst"])  # mostly ignored
-create = Command(slug="create", verbs=["create", "new", "c"])
-
-COMMANDS = [wurst, create]
 
 
 class Context(object):
