@@ -1,6 +1,6 @@
 import pytest
 
-from wurst.api.cli import Context, create, wurst
+from wurst.cli import Context, create, wurst
 from wurst.core.models import IssueType, Priority
 
 
