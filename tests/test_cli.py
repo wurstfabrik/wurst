@@ -1,7 +1,7 @@
 import pytest
 
 from wurst.cli import Context, create, wurst
-from wurst.core.models import IssueType, Priority
+from wurst.core.models import Issue, IssueType, Priority
 
 
 @pytest.mark.django_db
@@ -19,3 +19,10 @@ def test_build_context(basic_schema):
         task,
         "Turn Japsu's crude prototype into an actual parser"
     ]
+
+
+@pytest.mark.django_db
+def test_issue_parse(basic_schema, project):
+    issue = Issue.objects.create(project=project, type=basic_schema["type"]["task"], title="Hello")
+    parts = Context().enrich_command('wurst %s' % issue.key)
+    assert parts == [wurst, issue]

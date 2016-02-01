@@ -4,8 +4,10 @@ from __future__ import unicode_literals
 
 import sys
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import cached_property
 
+from wurst.core.consts import ISSUE_KEY_RE
 from wurst.core.models import Issue, IssueType, Priority, Project, Status
 
 from .commands import COMMANDS
@@ -47,6 +49,25 @@ class Context(object):
 
         return the_terms
 
+    def enrich_part(self, part):
+        """
+        Enriches a single part (which, well, might contain more than one actual word).
+
+        :param part: A part(-of-speech) to enrich.
+        :return: The part itself, or a model.
+        """
+
+        if part in self.terms:  # Try the "static" part dictionary...
+            return self.terms[part]
+
+        if ISSUE_KEY_RE.match(part):  # See if the part smells like an issue key...
+            try:
+                return Issue.objects.get(key=part)
+            except ObjectDoesNotExist:
+                pass
+
+        return part
+
     def enrich_command(self, command):
         """
         Enriches the command by replacing recognized words with their model instance counterparts.
@@ -55,4 +76,4 @@ class Context(object):
         :returns: The command split into words and model instances
         :rtype: list[str|django.db.models.Model|Command]
         """
-        return [self.terms.get(part, part) for part in shlex.split(command)]
+        return [self.enrich_part(part) for part in shlex.split(command)]
