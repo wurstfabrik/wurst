@@ -32,3 +32,25 @@ def test_issue_patch_api(basic_schema, project, admin_api_client):
     issue = Issue.objects.get(pk=resp["id"])
     assert issue.title == "nnep"
     assert reversion.get_for_object(issue).count() == 2
+
+
+@pytest.mark.django_db
+def test_issue_comments_api(basic_schema, project, admin_api_client):
+    issue = Issue.objects.create(project=project, title="durr", type=basic_schema["type"]["task"])
+    # Add comments:
+    for x in range(5):
+        resp = get_response_data(admin_api_client.post(reverse("v1:comment-list"), data={
+            "issue": issue.pk,
+            "text": "hey hey hey",
+        }), status_code=201)
+    # Patch the last comment:
+    resp = get_response_data(admin_api_client.patch(reverse("v1:comment-detail", kwargs={"pk": resp["id"]}), data={
+        "text": "nnep"
+    }), status_code=200)
+    assert issue.comments.count() == 5
+    resp = get_response_data(
+        admin_api_client.get(reverse("v1:issue-detail", kwargs={"pk": issue.pk}))
+    )
+    assert len(resp["comments"]) == 5
+    assert resp["comments"][0]["text"] == "hey hey hey"
+    assert resp["comments"][-1]["text"] == "nnep"

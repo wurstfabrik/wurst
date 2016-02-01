@@ -37,6 +37,13 @@ class ProjectSerializer(ScalarUnserializerMixin, serializers.ModelSerializer):
         model = Project
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+
+    creator = UserSerializer(read_only=True)
+
+
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
@@ -53,4 +60,10 @@ class IssueSerializer(serializers.ModelSerializer):
         fields = super(IssueSerializer, self).get_fields()
         fields["key"].required = False  # Inferred in `save`
         fields["key"].read_only = True
+        if self.many:  # List context? No comments, please.
+            fields.pop("comments", None)
         return fields
+
+    def __init__(self, instance=None, data=empty, **kwargs):
+        self.many = bool(kwargs.get("many"))
+        super(IssueSerializer, self).__init__(instance, data, **kwargs)

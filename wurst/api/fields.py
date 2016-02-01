@@ -18,6 +18,7 @@ def unserialize_by_scalar(queryset, value, key_fields=USUAL_KEY_FIELDS):
 
 class ScalarUnserializerMixin:
     scalar_key_fields = USUAL_KEY_FIELDS
+
     def to_internal_value(self, data):
         if not isinstance(data, (dict, list)):
             if hasattr(self, "get_queryset"):  # used on RelatedFields?

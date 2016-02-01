@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 
-from wurst.api.views import IssueViewSet, ProjectViewSet
+from wurst.api.views import CommentViewSet, IssueViewSet, ProjectViewSet
 
 
 def get_router():
@@ -12,4 +12,5 @@ def get_router():
     router = DefaultRouter()
     router.register(r'projects', ProjectViewSet)
     router.register(r'issues', IssueViewSet)
+    router.register(r'comments', CommentViewSet)
     return router
