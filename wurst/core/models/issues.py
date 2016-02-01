@@ -9,8 +9,16 @@ from reversion import revisions as reversion
 from wurst.core.consts import StatusCategory
 
 
+class NounsMixin(object):
+    def get_nouns(self):
+        nouns = set(self.nouns.split())
+        nouns.add(self.slug)
+        nouns.add(self.name)
+        return nouns
+
+
 @python_2_unicode_compatible
-class IssueType(models.Model):
+class IssueType(NounsMixin, models.Model):
     """
     An issue type, e.g. "Task", "Bug", "Story", ...
     """
@@ -25,10 +33,12 @@ class IssueType(models.Model):
 
 
 @python_2_unicode_compatible
-class Status(models.Model):
+class Status(NounsMixin, models.Model):
     """
     A status associated with a given issue, e.g. "to do", "in progress", "rejected", "done"
     """
+
+    nouns = u""
 
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from='name', unique=True)
@@ -43,7 +53,7 @@ class Status(models.Model):
 
 
 @python_2_unicode_compatible
-class Priority(models.Model):
+class Priority(NounsMixin, models.Model):
     """
     A priority for an issue, e.g. "high", "low", "critical", "whenever"
     """
