@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import sys
+from inspect import isclass
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import cached_property
@@ -10,7 +11,7 @@ from django.utils.functional import cached_property
 from wurst.core.consts import ISSUE_KEY_RE
 from wurst.core.models import Issue, IssueType, Priority, Project, Status
 
-from .commands import COMMANDS
+from .commands import Command, COMMANDS
 
 if sys.version_info[0] < 3:
     import ushlex as shlex
@@ -78,8 +79,19 @@ class Context(object):
         """
         Enriches the command by replacing recognized words with their model instance counterparts.
 
+        If multiple terms referring to Commands are found, only one is enriched; the rest are not
+        enriched but returned as-is.
+
         :param command: A string understood by shlex
         :returns: The command split into words and model instances
-        :rtype: list[str|django.db.models.Model|Command]
+        :rtype: Iterable[str|django.db.models.Model|Command]
         """
-        return [self.enrich_part(part) for part in shlex.split(command)]
+        found_cmd = False
+        for part in shlex.split(command):
+            e_part = self.enrich_part(part)
+            if isclass(e_part) and issubclass(e_part, Command):
+                if not found_cmd:
+                    found_cmd = True
+                else:
+                    e_part = part  # Revert back to yielding the string
+            yield e_part

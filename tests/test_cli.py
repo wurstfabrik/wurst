@@ -12,7 +12,7 @@ def test_build_context(basic_schema):
 
     parts = context.enrich_command('new critical task "Turn Japsu\'s crude prototype into an actual parser"')
 
-    assert parts == [
+    assert list(parts) == [
         CreateCommand,
         critical,
         task,
@@ -21,10 +21,20 @@ def test_build_context(basic_schema):
 
 
 @pytest.mark.django_db
+def test_multiple_commands():
+    parts = Context().enrich_command('new new new')
+    assert list(parts) == [
+        CreateCommand,
+        "new",
+        "new"
+    ]
+
+
+@pytest.mark.django_db
 def test_issue_parse(basic_schema, project):
     issue = Issue.objects.create(project=project, type=basic_schema["type"]["task"], title="Hello")
     parts = Context().enrich_command('set %s crit' % issue.key)
-    assert parts == [
+    assert list(parts) == [
         SetCommand,
         issue,
         basic_schema["priority"]["critical"]
