@@ -1,6 +1,7 @@
 import pytest
+from django.core.exceptions import ValidationError
 
-from wurst.cli import Context, CreateCommand, SetCommand
+from wurst.cli import Context, CreateCommand, execute, SetCommand
 from wurst.core.models import Issue, IssueType, Priority
 
 
@@ -39,3 +40,14 @@ def test_issue_parse(basic_schema, project):
         issue,
         basic_schema["priority"]["critical"]
     ]
+
+
+@pytest.mark.django_db
+def test_new_task(basic_schema, project):
+    with pytest.raises(ValidationError):
+        rv = execute('new task "Turn Japsu\'s crude prototype into an actual parser"')
+    # Oh, right, need to have a project
+    rv = execute('new task test "Turn Japsu\'s crude prototype into an actual parser"')
+    assert rv == Issue.objects.last()
+    assert rv.project == project
+    assert "Japsu" in rv.title
