@@ -1,6 +1,6 @@
 import pytest
 
-from wurst.cli import Context, create, wurst
+from wurst.cli import Context, CreateCommand, SetCommand
 from wurst.core.models import Issue, IssueType, Priority
 
 
@@ -10,11 +10,10 @@ def test_build_context(basic_schema):
     critical = Priority.objects.get(slug='critical')
     task = IssueType.objects.get(slug='task')
 
-    parts = context.enrich_command('wurst new critical task "Turn Japsu\'s crude prototype into an actual parser"')
+    parts = context.enrich_command('new critical task "Turn Japsu\'s crude prototype into an actual parser"')
 
     assert parts == [
-        wurst,
-        create,
+        CreateCommand,
         critical,
         task,
         "Turn Japsu's crude prototype into an actual parser"
@@ -24,5 +23,9 @@ def test_build_context(basic_schema):
 @pytest.mark.django_db
 def test_issue_parse(basic_schema, project):
     issue = Issue.objects.create(project=project, type=basic_schema["type"]["task"], title="Hello")
-    parts = Context().enrich_command('wurst %s' % issue.key)
-    assert parts == [wurst, issue]
+    parts = Context().enrich_command('set %s critical' % issue.key)
+    assert parts == [
+        SetCommand,
+        issue,
+        basic_schema["priority"]["critical"]
+    ]

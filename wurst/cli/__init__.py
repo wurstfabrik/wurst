@@ -1,2 +1,2 @@
-from .commands import COMMANDS, create, wurst  # noqa
+from .commands import COMMANDS, CreateCommand, SetCommand  # noqa
 from .context import Context  # noqa
