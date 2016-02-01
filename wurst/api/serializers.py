@@ -1,14 +1,24 @@
 # -- encoding: UTF-8 --
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from wurst.api.fields import EnumField, ScalarUnserializerMixin, SlugOrPKRelatedField
 from wurst.core.consts import StatusCategory
-from wurst.core.models import Issue, IssueType, Priority, Project, Status
+from wurst.core.models import Comment, Issue, IssueType, Priority, Project, Status
+
+
+class UserSerializer(ScalarUnserializerMixin, serializers.ModelSerializer):
+    scalar_key_fields = ("pk", "username")
+
+    class Meta:
+        model = get_user_model()
 
 
 class StatusSerializer(ScalarUnserializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Status
+
     category = EnumField(enum_cls=StatusCategory)
 
 
@@ -27,18 +37,33 @@ class ProjectSerializer(ScalarUnserializerMixin, serializers.ModelSerializer):
         model = Project
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+
+    creator = UserSerializer(read_only=True)
+
+
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
 
     serializer_related_field = SlugOrPKRelatedField
     project = ProjectSerializer()
-    status = StatusSerializer()
+    status = StatusSerializer(required=False)
     type = IssueTypeSerializer()
-    priority = PrioritySerializer()
+    priority = PrioritySerializer(required=False)
+    comments = CommentSerializer(many=True, required=False)
+    creator = UserSerializer(read_only=True)
 
     def get_fields(self):
         fields = super(IssueSerializer, self).get_fields()
-        for field in ("status", "key", "priority"):  # These can be inferred in `save`
-            fields[field].required = False
+        fields["key"].required = False  # Inferred in `save`
+        fields["key"].read_only = True
+        if self.many:  # List context? No comments, please.
+            fields.pop("comments", None)
         return fields
+
+    def __init__(self, instance=None, data=empty, **kwargs):
+        self.many = bool(kwargs.get("many"))
+        super(IssueSerializer, self).__init__(instance, data, **kwargs)

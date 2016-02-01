@@ -4,8 +4,10 @@ from django.utils.encoding import force_text
 from rest_framework.fields import Field
 from rest_framework.relations import RelatedField
 
+USUAL_KEY_FIELDS = ("pk", "slug")
 
-def unserialize_by_scalar(queryset, value, key_fields=("pk", "slug")):
+
+def unserialize_by_scalar(queryset, value, key_fields=USUAL_KEY_FIELDS):
     for field in key_fields:
         try:
             return queryset.get(**{field: value})
@@ -15,6 +17,8 @@ def unserialize_by_scalar(queryset, value, key_fields=("pk", "slug")):
 
 
 class ScalarUnserializerMixin:
+    scalar_key_fields = USUAL_KEY_FIELDS
+
     def to_internal_value(self, data):
         if not isinstance(data, (dict, list)):
             if hasattr(self, "get_queryset"):  # used on RelatedFields?
@@ -23,7 +27,7 @@ class ScalarUnserializerMixin:
                 queryset = self.Meta.model.objects.all()
             else:
                 raise ImproperlyConfigured("ScalarUnserializerMixin used on %r, unsupported" % self)
-            return unserialize_by_scalar(queryset, data)
+            return unserialize_by_scalar(queryset, data, key_fields=self.scalar_key_fields)
         return super(ScalarUnserializerMixin, self).to_internal_value(self, data)
 
 

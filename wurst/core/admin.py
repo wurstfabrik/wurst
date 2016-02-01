@@ -1,4 +1,5 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 
 from .models import Issue, IssueType, Priority, Project, Status
 
@@ -7,7 +8,7 @@ class IssueTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'nouns')
 
 
-class IssueAdmin(admin.ModelAdmin):
+class IssueAdmin(VersionAdmin):
     list_display = ('project', 'type', 'title', 'priority', 'status')
     list_filter = ('project', 'type', 'status')
 
