@@ -23,7 +23,7 @@ def test_build_context(basic_schema):
 @pytest.mark.django_db
 def test_issue_parse(basic_schema, project):
     issue = Issue.objects.create(project=project, type=basic_schema["type"]["task"], title="Hello")
-    parts = Context().enrich_command('set %s critical' % issue.key)
+    parts = Context().enrich_command('set %s crit' % issue.key)
     assert parts == [
         SetCommand,
         issue,

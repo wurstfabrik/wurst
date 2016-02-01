@@ -66,6 +66,12 @@ class Context(object):
             except ObjectDoesNotExist:
                 pass
 
+        # See if it's an unique prefix (if it's long enough anyway)
+        if len(part) > 2:
+            prefix_matches = [obj for (term, obj) in self.terms.items() if term.startswith(part)]
+            if len(prefix_matches) == 1:
+                return prefix_matches[0]
+
         return part
 
     def enrich_command(self, command):
