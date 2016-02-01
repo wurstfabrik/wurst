@@ -1,9 +1,7 @@
 # -- encoding: UTF-8 --
 from rest_framework import serializers
 
-from wurst.api.fields import (
-    EnumField, ScalarUnserializerMixin, SlugOrPKRelatedField
-)
+from wurst.api.fields import EnumField, ScalarUnserializerMixin, SlugOrPKRelatedField
 from wurst.core.consts import StatusCategory
 from wurst.core.models import Issue, IssueType, Priority, Project, Status
 

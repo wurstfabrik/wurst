@@ -1,5 +1,5 @@
 # -- encoding: UTF-8 --
-from django.core.exceptions import ObjectDoesNotExist, ValidationError, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.utils.encoding import force_text
 from rest_framework.fields import Field
 from rest_framework.relations import RelatedField
