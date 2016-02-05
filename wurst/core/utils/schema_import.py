@@ -1,9 +1,25 @@
 import sys
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import toml
 
-from wurst.core.models import IssueType, Priority, Status
+from wurst.core.models import IssueType, Priority, Status, Transition
+
+
+def sift(iterable, predicate):
+    """
+    Sift an iterable into two lists, those which pass the predicate and those who don't.
+
+    :param iterable:
+    :param predicate:
+    :return: (True-list, False-list)
+    :rtype: tuple[list, list]
+    """
+    t_list = []
+    f_list = []
+    for obj in iterable:
+        (t_list if predicate(obj) else f_list).append(obj)
+    return (t_list, f_list)
 
 
 class SchemaImporter:
@@ -17,11 +33,12 @@ class SchemaImporter:
     stderr = sys.stderr
     stdout = sys.stdout
 
-    type_to_class = {
-        "type": IssueType,
-        "status": Status,
-        "priority": Priority
-    }
+    type_to_class = OrderedDict([
+        ("type", IssueType),
+        ("status", Status),
+        ("priority", Priority),
+        ("transition", Transition),
+    ])
 
     def __init__(self):
         self.objects = defaultdict(dict)
@@ -45,13 +62,13 @@ class SchemaImporter:
         :return: Does not return a value, but the instance's
                  `.objects` dict will have been modified
         """
-        for obj_type, items in data.items():
+        for obj_type, klass in self.type_to_class.items():
+            items = data.get(obj_type, [])
             if not isinstance(items, list):
                 continue
             importer = getattr(self, "import_%s" % obj_type, None)
             if not importer:
-                if obj_type in self.type_to_class:
-                    importer = self.generic_importer
+                importer = self.generic_importer
             if not importer:
                 self.stderr.write("No importer for %r" % obj_type)
             for val in items:
@@ -70,11 +87,16 @@ class SchemaImporter:
         :return: The created object.
         """
         model_class = self.type_to_class[obj_type]
+        if hasattr(model_class, "mangle_import_datum"):
+            datum = model_class.mangle_import_datum(datum)
         obj = None
         if "slug" in datum:  # See if we already got one...
             obj = model_class.objects.filter(slug=datum["slug"]).first()
         if obj is None:  # Not found? Create it.
-            obj = model_class.objects.create(**datum)
+            m2m_fields, non_m2m_fields = sift(datum.items(), lambda item: isinstance(item[1], list))
+            obj = model_class.objects.create(**dict(non_m2m_fields))
+            for field, value in m2m_fields:
+                setattr(obj, field, value)
         idfr = getattr(obj, "slug", obj.pk)
         self.objects[obj_type][idfr] = obj
         self.stdout.write("%s processed: %s" % (obj_type.title(), idfr))

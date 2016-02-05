@@ -1,4 +1,5 @@
 from autoslug import AutoSlugField
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -25,3 +26,12 @@ class Transition(models.Model):
         datum["to_status"] = Status.objects.get(slug=datum["to_status"])
         datum["from_statuses"] = [Status.objects.get(slug=s) for s in datum.get("from_statuses", ())]
         return datum
+
+    def execute(self, issue):
+        if issue.status == self.to_status:  # no-op
+            return
+        if issue.type != self.type:
+            raise ValidationError("Issue %s type is not %s" % (issue, self.type))
+        if not self.from_any_status and not self.from_statuses.filter(id=issue.status_id).exists():
+            raise ValidationError("Issue %s status %s not allowed" % (issue, issue.status))
+        issue.status = self.to_status

@@ -1,6 +1,8 @@
+import six
 from autoslug.fields import AutoSlugField
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from enumfields import EnumIntegerField
@@ -8,6 +10,7 @@ from reversion import revisions as reversion
 
 from wurst.core.consts import StatusCategory
 from wurst.core.mixins.nouns import NounsMixin
+from wurst.core.models.workflow import Transition
 
 
 @python_2_unicode_compatible
@@ -19,6 +22,7 @@ class IssueType(NounsMixin, models.Model):
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from='name', unique=True)
     nouns = models.TextField(blank=True)
+
     # TODO: Color/icon
 
     def __str__(self):
@@ -110,7 +114,45 @@ class Issue(models.Model):
         if not self.priority_id:
             self.priority = Priority.objects.filter(value=0).first()
         if not self.status_id:
-            self.status = Status.objects.filter(value=StatusCategory.OPEN.value).order_by("value").first()
+            initial_transition = Transition.objects.filter(type_id=self.type_id, initial=True).first()
+            if initial_transition:
+                self.status = initial_transition.to_status
+            else:
+                self.status = Status.objects.filter(value=StatusCategory.OPEN.value).order_by("value").first()
 
     def __str__(self):
         return self.key
+
+    def transition(self, transition):
+        """
+        Execute the given transition.
+
+        Either a Transition or a Transition's slug may be passed in.
+
+        If there are no Transitions for this issue's type, the
+        `transition` may also directly refer to a status (or a status slug).
+
+        If the argument is a slug but there is no transition by that name, the
+        argument is expected to be a status slug and a transition
+        that will bring this issue from its current status to that status will
+        be sought.
+
+        :param transition: Transition/Status/slug, see above.
+        :return:
+        """
+        if not Transition.objects.filter(type_id=self.type_id).exists():
+            if isinstance(transition, six.string_types):
+                transition = Status.objects.get(slug=transition)
+            self.status = transition
+            return
+        if isinstance(transition, six.string_types):
+            try:
+                transition = Transition.objects.get(slug=transition)
+            except Transition.DoesNotExist:
+                transition = Transition.objects.filter(
+                    to_status__slug=transition,
+                    type=self.type,
+                ).filter(
+                    Q(from_any_status=True) | Q(from_statuses=self.status)
+                ).get()
+        return transition.execute(issue=self)
