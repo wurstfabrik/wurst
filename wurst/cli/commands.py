@@ -38,4 +38,16 @@ class SetCommand(Command):
     verbs = {"set", "s"}
 
 
+class BaseTransitionCommand(Command):
+    transition = None  # replaced by dynamic subclass creation
+
+    def execute(self, *args, **kwargs):
+        issue = kwargs.pop("issue", None)
+        if not issue:
+            raise ValueError("An issue is required to %s it" % self.name)
+        self.transition.execute(issue=issue)
+        issue.save()
+        return issue
+
+
 COMMANDS = [CreateCommand, SetCommand]

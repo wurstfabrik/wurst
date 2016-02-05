@@ -35,3 +35,9 @@ class Transition(models.Model):
         if not self.from_any_status and not self.from_statuses.filter(id=issue.status_id).exists():
             raise ValidationError("Issue %s status %s not allowed" % (issue, issue.status))
         issue.status = self.to_status
+
+    def get_verbs(self):
+        verbs = {self.name, self.slug}
+        if self.verbs:
+            verbs.update(set(self.verbs.split()))
+        return verbs

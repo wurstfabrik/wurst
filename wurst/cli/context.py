@@ -11,8 +11,9 @@ from django.utils.functional import cached_property
 
 from wurst.core.consts import ISSUE_KEY_RE
 from wurst.core.models import Issue, IssueType, Priority, Project, Status
+from wurst.core.models.workflow import Transition
 
-from .commands import COMMANDS
+from .commands import BaseTransitionCommand, COMMANDS
 
 if sys.version_info[0] < 3:
     import ushlex as shlex
@@ -48,6 +49,18 @@ class Context(object):
                 assert verb not in the_terms
 
                 the_terms[verb] = command
+
+        for transition in Transition.objects.all():
+            command_class = type(
+                # NB: The use of `str` here is perfectly on purpose:
+                #     on Python 2, class names must be ASCII strings,
+                #     and Python 3 doesn't mind at all.
+                str("%sTransitionCommand" % transition.slug.title()),
+                (BaseTransitionCommand,),
+                {"transition": transition}
+            )
+            for verb in transition.get_verbs():
+                the_terms[verb] = command_class
 
         return the_terms
 
