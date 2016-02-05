@@ -9,11 +9,12 @@ slug = "todo"
 [[status]]
 name = "In Progress"
 slug = "progress"
+category = 10
 
 [[status]]
 name = "Done"
 slug = "done"
-category = 2
+category = 80
 
 [[priority]]
 name = "Low"
