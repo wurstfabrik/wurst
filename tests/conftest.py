@@ -1,24 +1,25 @@
+import os
+
 import pytest
+import toml
 from rest_framework.test import APIClient
+from six import StringIO
 
 from wurst.core.consts import StatusCategory
 from wurst.core.models import IssueType, Priority, Project, Status
 from wurst.core.utils.schema_import import SchemaImporter
 
-BASIC_SCHEMA_DATA = {
-    'status': [{'name': 'To Do'}, {'name': 'In Progress'}, {'name': 'Done', 'category': 1}],
-    'type': [{'name': 'Task'}],
-    'priority': [
-        {'name': 'Low', 'value': -10}, {'name': 'Normal', 'value': 0},
-        {'name': 'High', 'value': 50}, {'name': 'Critical', 'value': 100}
-    ]
-}
+BASIC_SCHEMA_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "wurst", "core", "schemata", "basic.toml"
+)
+BASIC_SCHEMA_DATA = toml.load(BASIC_SCHEMA_PATH)
 
 
 @pytest.mark.django_db
 @pytest.fixture
 def basic_schema():
     schi = SchemaImporter()
+    schi.stdout = StringIO()
     schi.import_from_data(BASIC_SCHEMA_DATA)
     return schi.objects
 
