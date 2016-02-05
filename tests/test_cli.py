@@ -22,11 +22,14 @@ def test_build_context(basic_schema):
 
 
 @pytest.mark.django_db
-def test_multiple_commands():
-    parts = Context().enrich_command('new new new')
+def test_multiple_classes(basic_schema):
+    parts = Context().enrich_command('new new crit critic normal new')
     assert list(parts) == [
         CreateCommand,
         "new",
+        basic_schema["priority"]["critical"],
+        "critic",
+        "normal",
         "new"
     ]
 
