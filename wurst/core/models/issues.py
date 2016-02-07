@@ -140,7 +140,8 @@ class Issue(models.Model):
         :param transition: Transition/Status/slug, see above.
         :return:
         """
-        if not Transition.objects.filter(type_id=self.type_id).exists():
+        has_transitions = self.has_transitions()
+        if not has_transitions:
             if isinstance(transition, six.string_types):
                 transition = Status.objects.get(slug=transition)
             self.status = transition
@@ -156,3 +157,6 @@ class Issue(models.Model):
                     Q(from_any_status=True) | Q(from_statuses=self.status)
                 ).get()
         return transition.execute(issue=self)
+
+    def has_transitions(self):
+        return Transition.objects.filter(type_id=self.type_id).exists()
