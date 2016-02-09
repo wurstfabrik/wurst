@@ -7,6 +7,7 @@ ISSUE_KEY_RE = re.compile(r"^\w+-\d+$", re.I)
 
 class StatusCategory(Enum):
     OPEN = 0
-    DONE = 1
-    CLOSED = 2
+    IN_PROGRESS = 10
+    DONE = 80
+    CLOSED = 100
     # TODO: Maybe expand this later?

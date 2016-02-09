@@ -9,11 +9,12 @@ slug = "todo"
 [[status]]
 name = "In Progress"
 slug = "progress"
+category = 10
 
 [[status]]
 name = "Done"
 slug = "done"
-category = 2
+category = 80
 
 [[priority]]
 name = "Low"
@@ -34,3 +35,26 @@ value = 50
 name = "Critical"
 slug = "critical"
 value = 100
+
+[[transition]]
+type = "task"
+name = "Initial"
+slug = "initial"
+initial = true
+to_status = "todo"
+from_any_status = true
+
+[[transition]]
+type = "task"
+name = "In Progress"
+slug = "in-progress"
+to_status = "progress"
+from_any_status = true
+
+[[transition]]
+type = "task"
+name = "Mark Done"
+slug = "mark-done"
+verbs = "done"
+to_status = "done"
+from_statuses = ["progress"]

@@ -2,6 +2,7 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from wurst.cli import Context, CreateCommand, execute, SetCommand
+from wurst.core.consts import StatusCategory
 from wurst.core.models import Issue, IssueType, Priority
 
 
@@ -46,11 +47,16 @@ def test_issue_parse(basic_schema, project):
 
 
 @pytest.mark.django_db
-def test_new_task(basic_schema, project):
+def test_task_workflow(basic_schema, project):
     with pytest.raises(ValidationError):
-        rv = execute('new task "Turn Japsu\'s crude prototype into an actual parser"')
+        issue = execute('new task "Turn Japsu\'s crude prototype into an actual parser"')
     # Oh, right, need to have a project
-    rv = execute('new task test "Turn Japsu\'s crude prototype into an actual parser"')
-    assert rv == Issue.objects.last()
-    assert rv.project == project
-    assert "Japsu" in rv.title
+    issue = execute('new task test "Turn Japsu\'s crude prototype into an actual parser"')
+    assert issue == Issue.objects.last()
+    assert issue.project == project
+    assert "Japsu" in issue.title
+    issue = execute("in-progress %s" % issue.key)
+    assert issue.status.slug == "progress"
+    issue = execute("mark-done %s" % issue.key)
+    assert issue.status.category == StatusCategory.DONE
+
