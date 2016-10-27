@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import permissions, viewsets
+from rest_framework.views import APIView
 from reversion import revisions as reversion
 
 from wurst.api.serializers import CommentSerializer, IssueSerializer, ProjectSerializer
@@ -44,3 +45,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         with transaction.atomic(), reversion.create_revision():
             serializer.save()
             reversion.set_user(self.request.user)
+
+
+class CliView(APIView):
+    def post(self, request, *args, **kwargs):
+        raise NotImplementedError("...")
